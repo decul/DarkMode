@@ -1,0 +1,12 @@
+html.byz-dark {
+  min-height: 100%;
+  background-color: white;
+  filter: brightness(0.9) invert(1) hue-rotate(180deg);
+}
+html.byz-dark img,
+html.byz-dark video {
+  filter: hue-rotate(180deg) invert(1);
+}
+html.byz-dark body {
+  background-color: white;
+}

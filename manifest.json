@@ -1,0 +1,84 @@
+{
+    "name": "Dark Mode",
+    "description": "Enables dark mode on various websites",
+    "version": "1.0",
+    "manifest_version": 3,
+    "content_scripts": [
+        {
+            "run_at":     "document_start",
+            "matches":  [ "https://www.reddit.com/*"    ],
+            "css":      [ "reddit.css"                  ],
+            "js":       [ 
+                          "reddit.js", 
+                          "generic.js"     
+                        ]
+        },
+        {
+            "run_at":     "document_start",
+            "matches":  [ "https://www.reddit.com/r/pureasoiaf/*"   ],
+            "css":      [ "reddit_pureasoiaf.css"                   ],
+            "js":       [ "generic.js"                              ]
+        },
+        {
+            "run_at":     "document_start",
+            "matches":  [ "https://translate.google.pl/*"   ],
+            "css":      [ "translate.css"                   ],
+            "js":       [ "generic.js"                      ]
+        },
+        {
+            "run_at":     "document_start",
+            "matches":  [ "https://docs.google.com/*"       ],
+            "css":      [ "build/google-sheet.css"          ],
+            "js":       [ "generic.js"                      ]
+        },
+        {
+            "run_at":     "document_start",
+            "matches":  [ "https://docs.spring.io/*"        ],
+            "css":      [ "docs-spring.css"                 ],
+            "js":       [ "generic.js"                      ]
+        },
+        {
+            "run_at":     "document_start",
+            "matches":  [ "https://chat.openai.com/*"       ],
+            "css":      [ "gpt.css"                         ],
+            "js":       [ "generic.js"                      ]
+        },
+        {
+            "run_at": "document_start",
+            "match_origin_as_fallback": true,
+            "exclude_matches": [
+                "https://www.reddit.com/*",
+                "https://translate.google.pl/*",
+                "https://docs.google.com/*",
+                "https://docs.spring.io/*",
+                "https://chat.openai.com/*"
+            ],
+            "matches":  [ "<all_urls>"          ],
+            "css":      [ "build/generic.css"   ],
+            "js":       [ "generic.js"          ]
+        }
+    ],
+    "web_accessible_resources": [{
+        "resources": [ "img" ],
+        "matches": [ "*://*/*" ]
+    }],
+    "action": {
+        "default_title": "Dark mode",
+        "default_icon": {
+            "64": "img/icon.png"
+        }
+    },
+    "background": {
+        "service_worker": "worker.js"
+    },
+    "permissions": [
+        "tabs",
+        "activeTab",
+        "scripting",
+        "storage"
+    ],
+    "host_permissions": [
+        "<all_urls>",
+        "https://docs.google.com/*"
+    ]
+}

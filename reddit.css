@@ -1,0 +1,293 @@
+/* Logo */
+a#header-img.default-header {
+    background-image: url(https://i.imgur.com/7W1hKSl.png);
+    background-position: 0px 0px;
+}
+
+
+
+/* Text */
+body {
+    color: #d9d9d9;
+}
+
+
+
+/* Background */
+html > body,
+div#header,
+body.comments-page div.link,
+body.with-listing-chooser div.listing-chooser div.grippy {
+    background-color: #101010;
+}
+
+
+
+/* Borders */
+div#header,
+body.with-listing-chooser.listing-chooser-collapsed > div.listing-chooser > div.grippy:after {
+    border-color: #565656;
+}
+
+
+
+/* Top menu */
+a#sr-more-link,
+div#sr-header-area,
+div#sr-header-area .sr-bar a,
+div.dropdown.srdrop span.selected,
+div#sr-header-area button.redesign-beta-optin,
+div#sr-header-area button.redesign-beta-optin:before,
+div#header-bottom-right {
+    color: #a0a0a0;
+    background: #242424;
+    border: 0px;
+}
+
+
+
+/* Subreddits */
+div#sr-header-area .sr-bar:nth-of-type(2) a {
+    color: #eb7145;
+}
+
+div#sr-header-area .sr-bar:nth-of-type(2) a[href*="announcements"] {
+    color: #a0a0a0;
+}
+
+
+
+
+/* Subreddit name */
+span.pagename,
+span.pagename a {
+    color: white;
+}
+
+
+
+/* Main menu */
+ul.tabmenu {
+    border: none;
+    background-color: black;
+}
+
+ul.tabmenu li a {
+    background-color: #343434;
+    color: #d0d0d0;
+    border: 0px;
+    font-weight: 100;
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+}
+
+ul.tabmenu li.selected a {
+    background-color: #343434;
+    border: 0px;
+}
+
+ul.tabmenu li a[href*="top"] {
+    color: #ffffff;
+    font-weight: bold;
+}
+
+
+
+/* Right menu */
+#header-bottom-right a {
+    color: #45a2ff;
+}
+
+
+
+/* Text-boxes */
+textarea, 
+input {
+    background-color: #101010 !important;
+    color: white !important;
+}
+
+div.usertext.grayed div.usertext-body {
+    background-color: transparent;
+}
+
+
+
+/* Right column */
+div.side {
+    background-color: transparent;
+}
+
+div.side > div > a,
+div.side > div > div {
+    display: none;
+}
+
+
+
+/* Period selector */
+span.dropdown-title {
+    color: white;
+}
+
+div.menuarea {
+    border: none;
+}
+
+
+
+/* Next page btn */
+span.nextprev a,
+span.nextprev a:hover {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+span.nextprev a:hover {
+    color: #4280bf
+}
+
+
+
+
+/* Posts item */
+
+
+
+/* Thumbnail */
+.thumbnail.default,
+.thumbnail.self,
+.thumbnail.spoiler,
+.expando-button {
+    filter: grayscale(1) brightness(.55) contrast(5);
+}
+
+
+
+/* Title */
+div.thing a.title, 
+div.thing a.title.click, 
+div.thing a.title.loggedin,
+div.thing a.title.loggedin.click {
+    color: #e36c40;
+}
+
+.content div.thing a.title:visited, 
+.content div.thing.visited a.title {
+    color: #c72810;
+}
+
+
+
+/* Author */
+.link .entry p.tagline a {
+    color: #b9b9b9;
+}
+
+
+
+
+/* Spoiler stamp */
+span.spoiler-stamp,
+span.nsfw-stamp:after, 
+span.spoiler-stamp:after {
+    color: #555;
+    background-color: transparent;
+}
+
+
+
+/* span.flair {
+    background-color: transparent !important;
+    border: 0px !important;
+    color: #555 !important;
+} */
+
+
+
+/* Upvote arrow */
+div.arrow {
+    opacity: .6;
+}
+
+
+
+/* Buttons under posts & comments */
+div.entry ul.buttons li a,
+ul.buttons a.give-gold.gold-give-gold {
+    color: #545454 !important;
+}
+
+div.link div.entry ul.buttons li a.comments {
+    color: #347fbf !important;
+}
+
+
+
+
+
+
+/* Post */
+
+/* Post content */
+.comments-page div.link form.usertext div.md {
+    color: #d9d9d9;
+    background-color: transparent !important;
+    border: 1px solid rgb(76, 76, 76);
+    border-radius: 7px;
+    padding: 5px 10px;
+}
+
+div.md h1 {
+    margin-top: 2em;
+}
+
+div.pinnable-content.pinned {
+    background-color: #101010 !important;
+}
+
+
+
+/* Border */
+div.panestack-title {
+    border-color: transparent;
+}
+
+
+.commentarea .title {
+    color: #a0a0a0;
+}
+
+
+
+/* Quote */
+.thing form.usertext blockquote,
+div.md blockquote {
+    color: #ad7133;
+}
+
+
+
+/* Code */
+div.link div.md :not(pre) > code,
+div.md code {
+    background: #1f1f1f;
+    border-color: #2e2e2e;
+}
+
+
+
+/* Comments */
+div.comment form.usertext div.md {
+    color: #d9d9d9;
+}
+
+div.comment div.child {
+    border-left-color: #4c4c4c;
+    border-left-style: solid;
+}
+
+div.comment a.author {
+    color: rgb(78, 149, 219);
+}
+

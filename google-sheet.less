@@ -1,0 +1,43 @@
+// out: "build/google-sheet.css"
+
+html.byz-dark {
+    min-height: 100%;
+    background-color: white;
+    filter: brightness(0.9) invert(1) hue-rotate(180deg) brightness(120%); 
+
+    /* Restore colors of the logo and avatar */
+    a[aria-label="Docs"],
+    a[aria-label="Docs home"],
+    a[aria-label="Sheets"],
+    a[aria-label="Sheets home"],
+    a[aria-label^="Google Account: "] > img {
+        filter: brightness(0.83) saturate(.9) invert(1) hue-rotate(180deg);
+    }
+
+    // // Invert most elements, but exclude some
+    // body > div:not(.docs-colormenuitems) {
+    //     &[id], 
+    //     &[class], 
+    //     &:not([dir="ltr"]) {
+    //         filter: brightness(0.9) invert(1) hue-rotate(180deg) brightness(120%);
+    //     }
+    // }
+
+    // // Color palette
+    // .docs-colormenuitems {
+    //     background: hsl(0 0% 10% / 1);
+    //     box-shadow: 0 2px 6px 2px rgb(0 0 0 / 35%);
+
+    //     & > div:not(.docs-material-colorpalette) {
+    //         filter: invert(1);
+    //     }
+    // }
+
+    // // Cell editor
+    // .input-box {
+    //     filter: brightness(0.9) invert(1) hue-rotate(180deg) brightness(120%);
+    //     border: 2px solid #1a73e8;
+    // }
+
+    
+}

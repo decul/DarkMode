@@ -1,0 +1,12 @@
+
+.dark .flex-col > div.group:nth-of-type(even) {
+    background: #2b2c36;
+}
+
+div.prose {
+    color: #ececf1;
+}
+
+div[role="presentation"] > div.bottom-0 {
+    background-image: linear-gradient(180deg,rgba(53,55,64,0),#2b2c36 58.85%);
+}
