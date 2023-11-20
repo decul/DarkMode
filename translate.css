@@ -12,15 +12,6 @@ a[aria-label^="Google Account: "] > img {
 }
 
 
-/* Replace shadow in main "window" with border */
-/* If 'div.ccvoYb.EjH7wc' selector fails, because classes change, use the commented selector below */
-/* body > c-wiz > div > div > c-wiz > div:nth-of-type(2) > c-wiz > div:first-of-type, */
-/* div.ccvoYb.EjH7wc {
-    box-shadow: none !important;
-    border: 1px solid rgb(218,220,224);
-} */
-
-
 /* Make tooltips great again (stopped working?) */
 div.B2mKhd.eQGGme.xGUN1 {
     background-color: black;

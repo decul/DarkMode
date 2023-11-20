@@ -5,19 +5,18 @@
     "manifest_version": 3,
     "content_scripts": [
         {
-            "run_at":     "document_start",
-            "matches":  [ "https://www.reddit.com/*"    ],
-            "css":      [ "reddit.css"                  ],
-            "js":       [ 
-                          "reddit.js", 
-                          "generic.js"     
-                        ]
+            "run_at":    "document_start",
+            "matches": [ "https://www.reddit.com/*"    ],
+            "css":     [ "reddit.css"                  ],
+            "js": [ 
+                "reddit.js", 
+                "generic.js"     
+            ]
         },
         {
             "run_at":     "document_start",
             "matches":  [ "https://www.reddit.com/r/pureasoiaf/*"   ],
-            "css":      [ "reddit_pureasoiaf.css"                   ],
-            "js":       [ "generic.js"                              ]
+            "css":      [ "reddit_pureasoiaf.css"                   ]
         },
         {
             "run_at":     "document_start",
@@ -28,7 +27,7 @@
         {
             "run_at":     "document_start",
             "matches":  [ "https://docs.google.com/*"       ],
-            "css":      [ "build/google-sheet.css"          ],
+            "css":      [ "build/google-documents.css"          ],
             "js":       [ "generic.js"                      ]
         },
         {
@@ -78,7 +77,6 @@
         "storage"
     ],
     "host_permissions": [
-        "<all_urls>",
-        "https://docs.google.com/*"
+        "<all_urls>"
     ]
 }
