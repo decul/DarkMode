@@ -7,23 +7,26 @@ chrome.action.onClicked.addListener(activeTab => {
   let toggle = () => ByzioDarkMode.toggle();
   let update = () => ByzioDarkMode.update();
 
+  let togglePromise = chrome.scripting.executeScript({
+    target: { tabId: activeTab.id },
+    function: toggle
+  });
+
   let condition = { 
     url: /^.*:\/\/[^/]+\//.exec(activeTab.url)[0] + "*"
   };
 
   chrome.tabs.query(condition, async tabs => {
-    let toggled = false;
+    console.log("Tabs found: ", tabs);
+    await togglePromise;
 
     for (const tab of tabs) {
-      let promise = chrome.scripting.executeScript({
+      chrome.scripting.executeScript({
         target: { tabId: tab.id },
-        function: !toggled ? toggle : update
-      });
-      if (!toggled) {
-        await promise;
-        toggled = true;
-      }
-      console.log(tab);
+        function: update
+      })
+      .then(() => console.log("Theme changed on: " + tab.url))
+      .catch(err => console.log("Failed to change theme on: " + tab.url, err));
     };
   });
 });
