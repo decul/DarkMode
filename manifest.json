@@ -49,7 +49,6 @@
                 "https://www.reddit.com/*",
                 "https://translate.google.pl/*",
                 "https://docs.google.com/*",
-                "https://docs.spring.io/*",
                 "https://chat.openai.com/*"
             ],
             "matches":  [ "<all_urls>"          ],
