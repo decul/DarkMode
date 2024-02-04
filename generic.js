@@ -7,13 +7,15 @@ class ByzioDarkMode {
     }
 
     static toggle() {
-        let state = !this.isEnabled();
+        let state = !this.isEnabledLocally();
         this.setDarkClass(state);
-        this.saveEnabled(state);
+        this.saveEnabledLocally(state);
     }
 
-    static update() {
-        this.setDarkClass(this.isEnabled());
+    static async update() {
+        let enabledGlobally = await this.isEnabledGlobally();
+        let enabledLocally = this.isEnabledLocally();
+        this.setDarkClass(enabledGlobally && enabledLocally);
     }
 
     static setDarkClass(state) {
@@ -22,11 +24,16 @@ class ByzioDarkMode {
         html.toggleAttribute("byz-dark", state);
     }
 
-    static isEnabled() {
+    static isEnabledLocally() {
         return localStorage.getItem("byz_dark") === "true";
     }
 
-    static saveEnabled(state) {
+    static async isEnabledGlobally() {
+        let result = await chrome.storage.local.get(["enabledGlobally"]);
+        return result.enabledGlobally;
+    }
+
+    static saveEnabledLocally(state) {
         localStorage.setItem("byz_dark", state);
     }
 }
