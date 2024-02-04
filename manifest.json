@@ -6,12 +6,9 @@
     "content_scripts": [
         {
             "run_at":    "document_start",
-            "matches": [ "https://www.reddit.com/*"    ],
-            "css":     [ "reddit.css"                  ],
-            "js": [ 
-                "reddit.js", 
-                "generic.js"     
-            ]
+            "matches": [ "https://www.reddit.com/*"         ],
+            "css":     [ "reddit.css"                       ],
+            "js":      [ "reddit.js"                        ]
         },
         {
             "run_at":     "document_start",
@@ -21,26 +18,32 @@
         {
             "run_at":     "document_start",
             "matches":  [ "https://translate.google.pl/*"   ],
-            "css":      [ "translate.css"                   ],
-            "js":       [ "generic.js"                      ]
+            "css":      [ "translate.css"                   ]
         },
         {
             "run_at":     "document_start",
             "matches":  [ "https://docs.google.com/*"       ],
-            "css":      [ "build/google-documents.css"          ],
-            "js":       [ "generic.js"                      ]
+            "css":      [ "build/google-documents.css"      ]
+        },
+        {
+            "run_at":     "document_start",
+            "matches":  [ "https://mail.google.com/*"      ],
+            "css":      [ "build/gmail.css"                 ]
         },
         {
             "run_at":     "document_start",
             "matches":  [ "https://docs.spring.io/*"        ],
-            "css":      [ "docs-spring.css"                 ],
-            "js":       [ "generic.js"                      ]
+            "css":      [ "docs-spring.css"                 ]
         },
         {
             "run_at":     "document_start",
             "matches":  [ "https://chat.openai.com/*"       ],
-            "css":      [ "gpt.css"                         ],
-            "js":       [ "generic.js"                      ]
+            "css":      [ "gpt.css"                         ]
+        },
+        {
+            "run_at":     "document_start",
+            "matches":  [ "https://www.linkedin.com/*"      ],
+            "css":      [ "linkedIn.css"                    ]
         },
         {
             "run_at": "document_start",
@@ -52,9 +55,14 @@
                 "https://chat.openai.com/*"
             ],
             "matches":  [ "<all_urls>"          ],
-            "css":      [ "build/generic.css"   ],
+            "css":      [ "build/generic.css"   ]
+        },
+        {
+            "run_at": "document_start",
+            "matches":  [ "<all_urls>"          ],
             "js":       [ "generic.js"          ]
         }
+        
     ],
     "web_accessible_resources": [{
         "resources": [ "img" ],
@@ -63,8 +71,13 @@
     "action": {
         "default_title": "Dark mode",
         "default_icon": {
-            "64": "img/icon.png"
+            "16": "img/icon16.png"
         }
+    },
+    "icons": {
+        "16": "img/icon16.png",
+        "48": "img/icon48.png",
+        "128": "img/icon128.png"
     },
     "background": {
         "service_worker": "worker.js"

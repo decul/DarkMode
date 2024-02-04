@@ -3,7 +3,7 @@
 html.byz-dark,
 html[byz-dark] {
     min-height: 100%;
-    background-color: white;
+    background-color: white !important;
     filter: brightness(0.9) invert(1) hue-rotate(180deg) brightness(140%);
 
     img, video {
@@ -11,6 +11,7 @@ html[byz-dark] {
     }
 
     body {
-        background-color: white;
+        /* LinkedIn adds !important to their color */
+        background-color: white !important;
     }
 }
