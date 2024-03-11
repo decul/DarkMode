@@ -19,9 +19,9 @@ class ByzioDarkMode {
     }
 
     static setDarkClass(state) {
-        const html = document.querySelector('html');
-        html.classList.toggle("byz-dark", state);
-        html.toggleAttribute("byz-dark", state);
+        const root = document.children[0];
+        root.classList.toggle("byz-dark", state);
+        root.toggleAttribute("byz-dark", state);
     }
 
     static isEnabledLocally() {

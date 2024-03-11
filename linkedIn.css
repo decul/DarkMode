@@ -1,3 +1,5 @@
+
+/* Change overlay's translucent background back to black*/
 html.byz-dark div.artdeco-modal-overlay--is-top-layer {
     background-color: #ffffffc0;
 }

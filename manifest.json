@@ -5,10 +5,10 @@
     "manifest_version": 3,
     "content_scripts": [
         {
-            "run_at":    "document_start",
-            "matches": [ "https://www.reddit.com/*"         ],
-            "css":     [ "reddit.css"                       ],
-            "js":      [ "reddit.js"                        ]
+            "run_at":     "document_start",
+            "matches":  [ "https://www.reddit.com/*"         ],
+            "css":      [ "reddit.css"                       ],
+            "js":       [ "reddit.js"                        ]
         },
         {
             "run_at":     "document_start",
@@ -27,7 +27,7 @@
         },
         {
             "run_at":     "document_start",
-            "matches":  [ "https://mail.google.com/*"      ],
+            "matches":  [ "https://mail.google.com/*"       ],
             "css":      [ "build/gmail.css"                 ]
         },
         {
@@ -46,11 +46,15 @@
             "css":      [ "linkedIn.css"                    ]
         },
         {
+            "run_at":     "document_start",
+            "matches":  [ "https://www.notion.so/*"         ],
+            "css":      [ "build/notion.css"                ]
+        },
+        {
             "run_at": "document_start",
             "match_origin_as_fallback": true,
             "exclude_matches": [
                 "https://www.reddit.com/*",
-                "https://translate.google.pl/*",
                 "https://docs.google.com/*",
                 "https://chat.openai.com/*"
             ],

@@ -1,9 +1,4 @@
 
-/* Invert colors */
-body {
-    filter: brightness(0.93) invert(1) hue-rotate(180deg) brightness(1.3);
-}
-
 
 /* Restore colors of the logo and avatar */
 a[aria-label="Google Translate"] > span:first-of-type,
@@ -12,7 +7,7 @@ a[aria-label^="Google Account: "] > img {
 }
 
 
-/* Make tooltips great again (stopped working?) */
+/* Make tooltips great again */
 div.B2mKhd.eQGGme.xGUN1 {
     background-color: black;
     box-shadow: none;

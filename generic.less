@@ -2,16 +2,27 @@
 
 html.byz-dark,
 html[byz-dark] {
-    min-height: 100%;
-    background-color: white !important;
-    filter: brightness(0.9) invert(1) hue-rotate(180deg) brightness(140%);
-
-    img, video {
-        filter: brightness(0.71) hue-rotate(180deg) invert(1);
+    &[file-type="PDF"] {
+        filter: brightness(0.5);
     }
 
-    body {
-        /* LinkedIn adds !important to their color */
+    // .dark-theme fixes spring docs, which sometimes has light and sometimes dark mode
+    &:not([file-type="PDF"]):not(.dark-theme) {
+        min-height: 100%;
         background-color: white !important;
+        filter: brightness(0.9) invert(1) hue-rotate(180deg) brightness(140%);
+
+        img, video {
+            filter: brightness(0.71) hue-rotate(180deg) invert(1);
+        }
+
+        body {
+            /* LinkedIn adds !important to their color */
+            background-color: white !important;
+        }
     }
+}
+
+svg.byz-dark {
+    background-color: #1a1a1a;
 }

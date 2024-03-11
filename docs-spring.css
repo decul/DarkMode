@@ -1,7 +1,7 @@
-div.doc {
+html.dark-theme div.doc {
     color: white;
 }
 
-div.doc p code {
+html.dark-theme div.doc p code {
     color: #dddddd;
 }
