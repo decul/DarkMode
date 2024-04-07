@@ -27,7 +27,7 @@ chrome.action.onClicked.addListener(async activeTab => {
 });
 
 
-async function onClick(activeTab) {
+async function onDoubleClick(activeTab) {
   const result = await chrome.storage.local.get(["enabledGlobally"]);
   const enabled = !result.enabledGlobally;
   updateIcon(enabled);
@@ -36,7 +36,7 @@ async function onClick(activeTab) {
 }
 
 
-async function onDoubleClick(activeTab) {
+async function onClick(activeTab) {
   const result = await chrome.storage.local.get(["enabledGlobally"]);
   if (!result.enabledGlobally)
     return;
