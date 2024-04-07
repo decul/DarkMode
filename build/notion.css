@@ -1,0 +1,11 @@
+body.dark span.notion-enable-hover[style*="color:"]:not( [style*="color:rgba(155, 155, 155, 1)"]):not( [style*="color:rgba(255, 255, 255, 1)"]):not(
+        [spellcheck='false']
+    ) {
+  filter: saturate(1.5) brightness(1.3);
+}
+body.dark div.notion-text-block > div[style*="color:"] > div > div > a > span.notion-page-mention-token__title {
+  filter: saturate(1.5) brightness(1.3);
+}
+body:not(.dark) div.notion-page-content > div {
+  color: black;
+}
