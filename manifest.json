@@ -51,6 +51,11 @@
             "css":      [ "build/notion.css"                ]
         },
         {
+            "run_at":     "document_start",
+            "matches":  [ "*://*/osip/*"                    ],
+            "css":      [ "build/osip.css"                  ]
+        },
+        {
             "run_at": "document_start",
             "match_origin_as_fallback": true,
             "exclude_matches": [

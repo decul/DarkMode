@@ -1,0 +1,12 @@
+html.byz-dark div.modal-backdrop {
+  background: white;
+}
+html.byz-dark div.modal-content {
+  box-shadow: none;
+}
+html.byz-dark span.notify-badge {
+  z-index: 1;
+}
+html.byz-dark div.loading-overlay {
+  background: none repeat scroll 0 0 #d0d0d080;
+}
