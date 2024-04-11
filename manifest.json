@@ -56,6 +56,11 @@
             "css":      [ "build/osip.css"                  ]
         },
         {
+            "run_at":     "document_start",
+            "matches":  [ "https://redmine.unity-t.pl/*"    ],
+            "css":      [ "build/redmine.css"               ]
+        },
+        {
             "run_at": "document_start",
             "match_origin_as_fallback": true,
             "exclude_matches": [

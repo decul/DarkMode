@@ -1,0 +1,7 @@
+html.byz-dark #content div.issue {
+  background: #fafafa;
+}
+html.byz-dark div#header,
+html.byz-dark div#top-menu {
+  filter: brightness(0.6) hue-rotate(180deg) invert(1);
+}
