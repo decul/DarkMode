@@ -72,9 +72,14 @@
             "css":      [ "build/generic.css"   ]
         },
         {
-            "run_at": "document_start",
+            "run_at":     "document_start",
             "matches":  [ "<all_urls>"          ],
             "js":       [ "generic.js"          ]
+        },
+        {
+            "run_at":     "document_end",
+            "matches":  [ "<all_urls>"          ],
+            "js":       [ "htmlPrep.js"         ]
         }
         
     ],
