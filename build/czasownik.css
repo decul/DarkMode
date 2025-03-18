@@ -1,0 +1,9 @@
+html.byz-dark header,
+html.byz-dark footer {
+  background: white;
+  color: black;
+}
+html.byz-dark div#header,
+html.byz-dark div#top-menu {
+  filter: brightness(0.7) hue-rotate(180deg) invert(1) brightness(1.1);
+}
