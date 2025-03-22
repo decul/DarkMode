@@ -2,20 +2,60 @@ html.byz-dark[file-type="PDF"],
 html[byz-dark][file-type="PDF"] {
   filter: brightness(0.5);
 }
-html.byz-dark:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme),
-html[byz-dark]:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) {
+html.byz-dark:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark
+    ),
+html[byz-dark]:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark
+    ) {
   min-height: 100%;
   background-color: white !important;
   filter: brightness(0.91) invert(1) hue-rotate(180deg) brightness(140%);
 }
-html.byz-dark:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) img,
-html[byz-dark]:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) img,
-html.byz-dark:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) video,
-html[byz-dark]:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) video {
+html.byz-dark:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark
+    ) img,
+html[byz-dark]:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark
+    ) img,
+html.byz-dark:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark
+    ) video,
+html[byz-dark]:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark
+    ) video {
   filter: brightness(0.71) hue-rotate(180deg) invert(1);
 }
-html.byz-dark:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) body,
-html[byz-dark]:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) body {
+html.byz-dark:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark
+    ) body,
+html[byz-dark]:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark
+    ) body {
   /* LinkedIn adds !important to their color */
   background-color: white !important;
 }

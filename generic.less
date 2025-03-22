@@ -6,8 +6,12 @@ html[byz-dark] {
         filter: brightness(0.5);
     }
 
-    // `:not(.dark-theme)` fixes spring docs, which sometimes has light and sometimes dark mode
-    &:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) {
+    &:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark
+    ) {
         min-height: 100%;
         background-color: white !important;
         filter: brightness(0.91) invert(1) hue-rotate(180deg) brightness(140%);
