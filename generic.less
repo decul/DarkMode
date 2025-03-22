@@ -16,8 +16,10 @@ html[byz-dark] {
         background-color: white !important;
         filter: brightness(0.91) invert(1) hue-rotate(180deg) brightness(140%);
 
-        img, video {
-            filter: brightness(0.71) hue-rotate(180deg) invert(1);
+        img, image, video,
+        .photo[style^="background-image: url("],
+        .thumbnail[style^="background-image: url("] {
+            filter: brightness(0.71) hue-rotate(180deg) invert(1) drop-shadow(#bbb 0px 0px 1px);
         }
 
         body {
@@ -29,4 +31,12 @@ html[byz-dark] {
 
 svg.byz-dark {
     background-color: #1a1a1a;
+}
+
+
+// random
+
+div.photo-content-upper-container > div.photo-well-scrappy-view > div.height-controller,
+div.zoom-modal:before {
+    background: white;
 }

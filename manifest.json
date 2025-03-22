@@ -61,6 +61,11 @@
             "css":      [ "build/redmine.css"               ]
         },
         {
+            "run_at":     "document_end",
+            "matches":  [ "https://vuejs.org/*"    ],
+            "css":      [ "build/vuejs.css"               ]
+        },
+        {
             "run_at":     "document_start",
             "matches":  [ "http://czasownik.krk.ut/*"    ],
             "css":      [ "build/czasownik.css"               ]
@@ -71,7 +76,8 @@
             "exclude_matches": [
                 "https://www.reddit.com/*",
                 "https://docs.google.com/*",
-                "https://chat.openai.com/*"
+                "https://chat.openai.com/*",
+                "https://vuejs.org/*"
             ],
             "matches":  [ "<all_urls>"          ],
             "css":      [ "build/generic.css"   ]

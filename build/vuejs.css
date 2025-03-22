@@ -1,0 +1,3 @@
+html.byz-dark .output-container iframe {
+  filter: brightness(0.9) invert(1) hue-rotate(180deg);
+}
