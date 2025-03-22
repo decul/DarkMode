@@ -10,9 +10,15 @@ html[byz-dark]:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) {
 }
 html.byz-dark:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) img,
 html[byz-dark]:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) img,
+html.byz-dark:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) image,
+html[byz-dark]:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) image,
 html.byz-dark:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) video,
-html[byz-dark]:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) video {
-  filter: brightness(0.71) hue-rotate(180deg) invert(1);
+html[byz-dark]:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) video,
+html.byz-dark:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) .photo[style^="background-image: url("],
+html[byz-dark]:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) .photo[style^="background-image: url("],
+html.byz-dark:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) .thumbnail[style^="background-image: url("],
+html[byz-dark]:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) .thumbnail[style^="background-image: url("] {
+  filter: brightness(0.71) hue-rotate(180deg) invert(1) drop-shadow(#bbb 0px 0px 1px);
 }
 html.byz-dark:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) body,
 html[byz-dark]:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) body {
@@ -21,4 +27,8 @@ html[byz-dark]:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) bo
 }
 svg.byz-dark {
   background-color: #1a1a1a;
+}
+div.photo-content-upper-container > div.photo-well-scrappy-view > div.height-controller,
+div.zoom-modal:before {
+  background: white;
 }

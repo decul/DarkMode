@@ -25,6 +25,8 @@ class ByzioDarkMode {
     }
 
     static isEnabledLocally() {
+        if (location.host.endsWith("pinterest.com"))
+            return true;
         return localStorage.getItem("byz_dark") === "true";
     }
 
