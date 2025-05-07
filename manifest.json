@@ -7,18 +7,18 @@
         {
             "run_at":     "document_start",
             "matches":  [ "https://www.reddit.com/*"         ],
-            "css":      [ "reddit.css"                       ],
-            "js":       [ "reddit.js"                        ]
+            "css":      [ "src/reddit/reddit.css"            ],
+            "js":       [ "src/reddit/reddit.js"                        ]
         },
         {
             "run_at":     "document_start",
             "matches":  [ "https://www.reddit.com/r/pureasoiaf/*"   ],
-            "css":      [ "reddit_pureasoiaf.css"                   ]
+            "css":      [ "src/reddit/reddit_pureasoiaf.css"                   ]
         },
         {
             "run_at":     "document_start",
             "matches":  [ "https://translate.google.pl/*"   ],
-            "css":      [ "translate.css"                   ]
+            "css":      [ "src/google/translate.css"                   ]
         },
         {
             "run_at":     "document_start",
@@ -33,17 +33,27 @@
         {
             "run_at":     "document_start",
             "matches":  [ "https://docs.spring.io/*"        ],
-            "css":      [ "docs-spring.css"                 ]
+            "css":      [ "src/docs-spring.css"                 ]
         },
         {
             "run_at":     "document_start",
-            "matches":  [ "https://chat.openai.com/*"       ],
-            "css":      [ "gpt.css"                         ]
+            "matches":  [ "https://chatgpt.com/*"       ],
+            "css":      [ "src/gpt.css"                         ]
+        },
+        {
+            "run_at":     "document_start",
+            "matches":  [ "https://gemini.google.com/*"       ],
+            "css":      [ "src/google/gemini.css"                         ]
+        },
+        {
+            "run_at":     "document_end",
+            "matches":  [ "https://chat.deepseek.com/*"       ],
+            "css":      [ "src/deep-seek.css"                         ]
         },
         {
             "run_at":     "document_start",
             "matches":  [ "https://www.linkedin.com/*"      ],
-            "css":      [ "linkedIn.css"                    ]
+            "css":      [ "src/linkedIn.css"                    ]
         },
         {
             "run_at":     "document_start",
@@ -85,12 +95,12 @@
         {
             "run_at":     "document_start",
             "matches":  [ "<all_urls>"          ],
-            "js":       [ "generic.js"          ]
+            "js":       [ "src/generic/generic.js"          ]
         },
         {
             "run_at":     "document_end",
             "matches":  [ "<all_urls>"          ],
-            "js":       [ "htmlPrep.js"         ]
+            "js":       [ "src/scripts/htmlPrep.js"         ]
         }
         
     ],
@@ -110,7 +120,7 @@
         "128": "img/icon128.png"
     },
     "background": {
-        "service_worker": "worker.js"
+        "service_worker": "src/scripts/worker.js"
     },
     "permissions": [
         "tabs",

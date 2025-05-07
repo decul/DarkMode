@@ -1,0 +1,4 @@
+
+span.user-query-bubble-with-background:not(.edit-mode) {
+    background-color: #0b4d8f !important;
+}

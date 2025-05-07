@@ -6,41 +6,105 @@ html.byz-dark:not(
         [file-type="PDF"], 
         [file-type="IMG"], 
         .dark-theme, 
-        .dark
+        .dark,
+        .theme-dark
     ),
 html[byz-dark]:not(
         [file-type="PDF"], 
         [file-type="IMG"], 
         .dark-theme, 
-        .dark
+        .dark,
+        .theme-dark
     ) {
   min-height: 100%;
   background-color: white !important;
   filter: brightness(0.91) invert(1) hue-rotate(180deg) brightness(140%);
 }
-html.byz-dark:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) img,
-html[byz-dark]:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) img,
-html.byz-dark:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) image,
-html[byz-dark]:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) image,
-html.byz-dark:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) video,
-html[byz-dark]:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) video,
-html.byz-dark:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) .photo[style^="background-image: url("],
-html[byz-dark]:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) .photo[style^="background-image: url("],
-html.byz-dark:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) .thumbnail[style^="background-image: url("],
-html[byz-dark]:not([file-type="PDF"]):not([file-type="IMG"]):not(.dark-theme) .thumbnail[style^="background-image: url("] {
+html.byz-dark:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark,
+        .theme-dark
+    ) img,
+html[byz-dark]:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark,
+        .theme-dark
+    ) img,
+html.byz-dark:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark,
+        .theme-dark
+    ) image,
+html[byz-dark]:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark,
+        .theme-dark
+    ) image,
+html.byz-dark:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark,
+        .theme-dark
+    ) video,
+html[byz-dark]:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark,
+        .theme-dark
+    ) video,
+html.byz-dark:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark,
+        .theme-dark
+    ) .photo[style^="background-image: url("],
+html[byz-dark]:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark,
+        .theme-dark
+    ) .photo[style^="background-image: url("],
+html.byz-dark:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark,
+        .theme-dark
+    ) .thumbnail[style^="background-image: url("],
+html[byz-dark]:not(
+        [file-type="PDF"], 
+        [file-type="IMG"], 
+        .dark-theme, 
+        .dark,
+        .theme-dark
+    ) .thumbnail[style^="background-image: url("] {
   filter: brightness(0.71) hue-rotate(180deg) invert(1) drop-shadow(#bbb 0px 0px 1px);
 }
 html.byz-dark:not(
         [file-type="PDF"], 
         [file-type="IMG"], 
         .dark-theme, 
-        .dark
+        .dark,
+        .theme-dark
     ) body,
 html[byz-dark]:not(
         [file-type="PDF"], 
         [file-type="IMG"], 
         .dark-theme, 
-        .dark
+        .dark,
+        .theme-dark
     ) body {
   /* LinkedIn adds !important to their color */
   background-color: white !important;
