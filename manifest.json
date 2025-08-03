@@ -38,7 +38,7 @@
         {
             "run_at":     "document_start",
             "matches":  [ "https://chatgpt.com/*"       ],
-            "css":      [ "src/gpt.css"                         ]
+            "css":      [ "build/gpt.css"               ]
         },
         {
             "run_at":     "document_start",
