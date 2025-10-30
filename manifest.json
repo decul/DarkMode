@@ -101,6 +101,11 @@
             "run_at":     "document_end",
             "matches":  [ "<all_urls>"          ],
             "js":       [ "src/scripts/htmlPrep.js"         ]
+        },
+        {
+            "run_at":     "document_idle",
+            "matches":  [ "<all_urls>"          ],
+            "js":       [ "src/generic/modifier.js"          ]
         }
         
     ],
