@@ -1,12 +1,10 @@
-// content.js
-// Dodaje nowe reguły override dla półprzezroczystych teł z prefiksem:
-// html.byz-dark <selector>, html[byz-dark] <selector>
-(() => {
+
+class Modifier {
     'use strict';
 
-    function addRecolorOverrides(opts = {}) {
-        const { color = '#ff3b30', rgb = null, styleId = 'byz-recolor' } = opts;
-        const NEW_RGB = rgb ? arrToRgb(rgb) : hexToRgb(color);
+    static addRecolorOverrides() {
+        const styleId = 'byz-recolor';
+        const BLACK = this.hexToRgb("#fff");
 
         const result = {
             rulesScanned: 0,
@@ -27,12 +25,14 @@
                 result.sheetsSkipped++;
                 continue;
             }
-            if (!rules) continue;
+
+            if (!rules) 
+                continue;
 
             for (const rule of Array.from(rules)) {
-                processRuleDeep(rule, (styleRule) => {
+                this.processRuleDeep(rule, (styleRule) => {
                     result.rulesScanned++;
-                    const s = styleRule.style;
+                    const style = styleRule.style;
 
                     // Sprawdź potencjalne własności tła
                     const candidates = [
@@ -44,23 +44,23 @@
                     let decls = [];
 
                     for (const [prop, singleColorOnly] of candidates) {
-                        const val = s.getPropertyValue(prop);
+                        const val = style.getPropertyValue(prop);
                         if (!val) continue;
-                        if (!hasSemiTransparentColor(val)) continue;
+                        if (!this.hasSemiTransparentColor(val)) continue;
 
                         let newVal;
                         if (singleColorOnly) {
-                            const a = extractFirstAlpha(val);
+                            const a = this.extractFirstAlpha(val);
                             if (a == null || a <= 0 || a >= 1) continue;
-                            newVal = rgbaString(NEW_RGB, a);
+                            newVal = this.rgbaString(BLACK, a);
                         } else {
-                            const replaced = recolorStringKeepingAlpha(val, NEW_RGB);
+                            const replaced = this.recolorStringKeepingAlpha(val, BLACK);
                             if (replaced === val) continue;
                             newVal = replaced;
                         }
 
                         // Zachowaj !important jeśli było
-                        const prio = s.getPropertyPriority(prop);
+                        const prio = style.getPropertyPriority(prop);
                         if (prio) newVal += ' !important';
 
                         decls.push([prop, newVal]);
@@ -109,35 +109,15 @@
         }
         styleEl.textContent = cssText;
 
-        // Zwróć statystyki i helpery toggle
-        return {
-            ...result,
-            styleId,
-            bytes: cssText.length,
-            enableDarkFlag() {
-                document.documentElement.classList.add('byz-dark');
-            },
-            disableDarkFlag() {
-                document.documentElement.classList.remove('byz-dark');
-                document.documentElement.removeAttribute('byz-dark');
-            },
-            setAttrFlag(v = true) {
-                if (v) document.documentElement.setAttribute('byz-dark', '');
-                else document.documentElement.removeAttribute('byz-dark');
-            },
-            removeStyle() {
-                const el = document.getElementById(styleId);
-                if (el) el.remove();
-            },
-        };
+        console.log(result);
     }
 
     // ==== traversal ====
-    function processRuleDeep(rule, onStyleRule) {
+    static processRuleDeep(rule, onStyleRule) {
         // Reguły grupujące (@media, @supports, @layer, @container itp.)
         if ('cssRules' in rule && rule.cssRules?.length) {
             for (const sub of Array.from(rule.cssRules)) {
-                processRuleDeep(sub, onStyleRule);
+                this.processRuleDeep(sub, onStyleRule);
             }
             return;
         }
@@ -147,7 +127,7 @@
     }
 
     // ==== wykrywanie i zamiana kolorów z alfą ====
-    const re = {
+    static re = {
         rgbaComma: /rgba\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d*\.?\d+)\s*\)/gi,
         rgbSlash: /rgb\(\s*(\d{1,3})\s+(\d{1,3})\s+(\d{1,3})\s*\/\s*(\d*\.?\d+)\s*\)/gi,
         hsla: /hsla\(\s*([^,()]+)\s*,\s*([^,()]+)\s*,\s*([^,()]+)\s*,\s*(\d*\.?\d+)\s*\)/gi,
@@ -156,18 +136,18 @@
         hex4: /#([0-9a-fA-F]{4})\b/g,
     };
 
-    function hasSemiTransparentColor(str) {
-        if (matchAlphaBetween0and1(str, re.rgbaComma)) return true;
-        if (matchAlphaBetween0and1(str, re.rgbSlash)) return true;
-        if (matchAlphaBetween0and1(str, re.hsla)) return true;
-        if (matchAlphaBetween0and1(str, re.hslSlash)) return true;
+    static hasSemiTransparentColor(str) {
+        if (this.matchAlphaBetween0and1(str, this.re.rgbaComma)) return true;
+        if (this.matchAlphaBetween0and1(str, this.re.rgbSlash)) return true;
+        if (this.matchAlphaBetween0and1(str, this.re.hsla)) return true;
+        if (this.matchAlphaBetween0and1(str, this.re.hslSlash)) return true;
 
-        let m = re.hex8.exec(str); re.hex8.lastIndex = 0;
+        let m = this.re.hex8.exec(str); this.re.hex8.lastIndex = 0;
         if (m) {
             const a = parseInt(m[1].slice(6, 8), 16) / 255;
             if (a > 0 && a < 1) return true;
         }
-        m = re.hex4.exec(str); re.hex4.lastIndex = 0;
+        m = this.re.hex4.exec(str); this.re.hex4.lastIndex = 0;
         if (m) {
             const a = parseInt(m[1].slice(3, 4) + m[1].slice(3, 4), 16) / 255;
             if (a > 0 && a < 1) return true;
@@ -175,7 +155,7 @@
         return false;
     }
 
-    function matchAlphaBetween0and1(str, regex) {
+    static matchAlphaBetween0and1(str, regex) {
         regex.lastIndex = 0;
         let m;
         while ((m = regex.exec(str))) {
@@ -185,8 +165,8 @@
         return false;
     }
 
-    function extractFirstAlpha(str) {
-        for (const rx of [re.rgbaComma, re.rgbSlash, re.hsla, re.hslSlash]) {
+    static extractFirstAlpha(str) {
+        for (const rx of [this.re.rgbaComma, this.re.rgbSlash, this.re.hsla, this.re.hslSlash]) {
             rx.lastIndex = 0;
             const m = rx.exec(str);
             if (m) {
@@ -194,47 +174,47 @@
                 if (!Number.isNaN(a)) return a;
             }
         }
-        re.hex8.lastIndex = 0;
-        let m = re.hex8.exec(str);
+        this.re.hex8.lastIndex = 0;
+        let m = this.re.hex8.exec(str);
         if (m) return parseInt(m[1].slice(6, 8), 16) / 255;
-        re.hex4.lastIndex = 0;
-        m = re.hex4.exec(str);
+        this.re.hex4.lastIndex = 0;
+        m = this.re.hex4.exec(str);
         if (m) return parseInt(m[1].slice(3, 4) + m[1].slice(3, 4), 16) / 255;
         return null;
     }
 
-    function recolorStringKeepingAlpha(str, NEW_RGB) {
-        const toRgba = (_, a) => rgbaString(NEW_RGB, clamp01(parseFloat(a)));
+    static recolorStringKeepingAlpha(str, NEW_RGB) {
+        const toRgba = (_, a) => this.rgbaString(NEW_RGB, this.clamp01(parseFloat(a)));
 
-        str = str.replace(re.rgbaComma, (_, _r, _g, _b, a) => toRgba(_, a));
-        str = str.replace(re.rgbSlash, (_, _r, _g, _b, a) => toRgba(_, a));
-        str = str.replace(re.hsla, () => {
+        str = str.replace(this.re.rgbaComma, (_, _r, _g, _b, a) => toRgba(_, a));
+        str = str.replace(this.re.rgbSlash, (_, _r, _g, _b, a) => toRgba(_, a));
+        str = str.replace(this.re.hsla, () => {
             const args = arguments; // (..., a, idx, input)
             const a = args[3];
             return toRgba(null, a);
         });
-        str = str.replace(re.hslSlash, (_, a) => toRgba(_, a));
+        str = str.replace(this.re.hslSlash, (_, a) => toRgba(_, a));
 
-        str = str.replace(re.hex8, (_, hex) => {
+        str = str.replace(this.re.hex8, (_, hex) => {
             const a = parseInt(hex.slice(6, 8), 16) / 255;
             if (a <= 0 || a >= 1) return _;
-            return rgbaString(NEW_RGB, a);
+            return this.rgbaString(NEW_RGB, a);
         });
-        str = str.replace(re.hex4, (_, hex) => {
+        str = str.replace(this.re.hex4, (_, hex) => {
             const aNib = hex.slice(3, 4);
             const a = parseInt(aNib + aNib, 16) / 255;
             if (a <= 0 || a >= 1) return _;
-            return rgbaString(NEW_RGB, a);
+            return this.rgbaString(NEW_RGB, a);
         });
 
         return str;
     }
 
     // ==== utils kolorów ====
-    function rgbaString({ r, g, b }, a) {
-        return `rgba(${clamp255(r)}, ${clamp255(g)}, ${clamp255(b)}, ${clamp01(a)})`;
+    static rgbaString({ r, g, b }, a) {
+        return `rgba(${this.clamp255(r)}, ${this.clamp255(g)}, ${this.clamp255(b)}, ${this.clamp01(a)})`;
     }
-    function hexToRgb(hex) {
+    static hexToRgb(hex) {
         let h = hex.trim();
         if (h.startsWith('#')) h = h.slice(1);
         if (h.length === 3) h = h.split('').map(c => c + c).join('');
@@ -243,15 +223,13 @@
         if (h.length === 8) return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16) };
         throw new Error(`Niepoprawny HEX: ${hex}`);
     }
-    function arrToRgb(a) {
+    static arrToRgb(a) {
         if (!Array.isArray(a) || a.length !== 3) throw new Error('rgb musi być [r,g,b]');
         return { r: +a[0], g: +a[1], b: +a[2] };
     }
-    const clamp255 = (n) => Math.max(0, Math.min(255, Math.round(n)));
-    const clamp01 = (n) => Math.max(0, Math.min(1, +n));
+    static clamp255 = (n) => Math.max(0, Math.min(255, Math.round(n)));
+    static clamp01 = (n) => Math.max(0, Math.min(1, +n));
 
-    // Eksport
-    window.addRecolorOverrides = addRecolorOverrides;
-})();
+}
 
-const res = addRecolorOverrides({ color: '#00bfff' });
+const res = Modifier.addRecolorOverrides();
