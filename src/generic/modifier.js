@@ -5,125 +5,177 @@ class Modifier {
     static addRecolorOverrides() {
         const styleId = 'byz-recolor';
         const BLACK = this.hexToRgb("#fff");
+        const includeAdopted = true;
+        const includeShadowRoots = true;
+        const maxShadowRoots = 200;
+
+        // --- gather contexts (document + shadow roots) and their stylesheets
+        const contexts = collectContexts({ styleId, includeAdopted, includeShadowRoots, maxShadowRoots });
 
         const result = {
+            contexts: contexts.length,
             rulesScanned: 0,
             styleRulesMatched: 0,
             newRulesInserted: 0,
             sheetsSkipped: 0,
         };
 
-        // Zbierz nowe reguły jako plain CSS (szybciej niż setProperty w pętli)
-        const cssChunks = [];
-        const seen = new Set(); // unikaj duplikatów: key = selector||prop||value
+        // process each context separately (so we can inject rules into that root)
+        for (const ctx of contexts) {
+            const cssChunks = [];
+            const seen = new Set(); // unikaj duplikatów: key = selector||prop||value
 
-        for (const sheet of Array.from(document.styleSheets)) {
-            let rules;
-            try {
-                rules = sheet.cssRules; // może wywalić SecurityError (CORS)
-            } catch {
-                result.sheetsSkipped++;
-                continue;
-            }
+            const visitRule = (styleRule) => {
+                // grouping blocks (@media/@supports/@layer etc.)
+                if ('cssRules' in styleRule && styleRule.cssRules?.length) {
+                    for (const sub of Array.from(styleRule.cssRules)) visitRule(sub);
+                    return;
+                }
+                if (styleRule.type !== CSSRule.STYLE_RULE || !styleRule.style)
+                    return;
 
-            if (!rules) 
-                continue;
-
-            for (const rule of Array.from(rules)) {
-                this.processRuleDeep(rule, (styleRule) => {
-                    result.rulesScanned++;
+                result.rulesScanned++;
                     const style = styleRule.style;
 
-                    // Sprawdź potencjalne własności tła
-                    const candidates = [
-                        ['background-color', true],
-                        ['background', false],
-                        ['background-image', false],
-                    ];
+                // Sprawdź potencjalne własności tła
+                const candidates = [
+                    ['background-color', true],
+                    ['background', false],
+                    ['background-image', false],
+                ];
 
-                    let decls = [];
+                let decls = [];
 
-                    for (const [prop, singleColorOnly] of candidates) {
+                for (const [prop, singleColorOnly] of candidates) {
                         const val = style.getPropertyValue(prop);
-                        if (!val) continue;
+                    if (!val) continue;
                         if (!this.hasSemiTransparentColor(val)) continue;
 
-                        let newVal;
-                        if (singleColorOnly) {
+                    let newVal;
+                    if (singleColorOnly) {
                             const a = this.extractFirstAlpha(val);
-                            if (a == null || a <= 0 || a >= 1) continue;
+                        if (a == null || a <= 0 || a >= 1) continue;
                             newVal = this.rgbaString(BLACK, a);
-                        } else {
+                    } else {
                             const replaced = this.recolorStringKeepingAlpha(val, BLACK);
-                            if (replaced === val) continue;
-                            newVal = replaced;
-                        }
-
-                        // Zachowaj !important jeśli było
-                        const prio = style.getPropertyPriority(prop);
-                        if (prio) newVal += ' !important';
-
-                        decls.push([prop, newVal]);
+                        if (replaced === val) continue;
+                        newVal = replaced;
                     }
 
-                    if (decls.length === 0) return;
+                    // Zachowaj !important jeśli było
+                        const prio = style.getPropertyPriority(prop);
+                    if (prio) newVal += ' !important';
 
-                    result.styleRulesMatched++;
+                    decls.push([prop, newVal]);
+                }
 
-                    // Rozbij selektory po przecinku i zbuduj z prefiksami html.byz-dark/attr
-                    const originalSelectors = styleRule.selectorText.split(',');
-                    const prefixedSelectors = [];
-                    for (let sel of originalSelectors) {
-                        sel = sel.trim();
-                        if (!sel) continue;
+                if (!decls.length) return;
+
+                result.styleRulesMatched++;
+
+                // Rozbij selektory po przecinku i zbuduj z prefiksami html.byz-dark/attr
+                const originalSelectors = styleRule.selectorText.split(',');
+                const prefixedSelectors = [];
+                for (let sel of originalSelectors) {
+                    sel = sel.trim();
+                    if (!sel) continue;
+                    if (ctx.type === 'document') {
                         prefixedSelectors.push(`html.byz-dark ${sel}`);
                         prefixedSelectors.push(`html[byz-dark] ${sel}`);
+                    } else {
+                        // shadow root: inject inside the root using :host-context()
+                        prefixedSelectors.push(`:host-context(html.byz-dark) ${sel}`);
+                        prefixedSelectors.push(`:host-context(html[byz-dark]) ${sel}`);
                     }
+                }
 
-                    if (prefixedSelectors.length === 0) return;
+                if (prefixedSelectors.length === 0) return;
 
-                    // Uniknij duplikatów na poziomie (selector×decl)
-                    const block = decls
-                        .map(([prop, val]) => `${prop}: ${val};`)
-                        .join(' ');
+                // Uniknij duplikatów na poziomie (selector×decl)
+                const block = decls
+                    .map(([prop, val]) => `${prop}: ${val};`)
+                    .join(' ');
 
-                    for (const prefSel of prefixedSelectors) {
-                        const key = prefSel + '|' + block;
-                        if (seen.has(key)) continue;
-                        seen.add(key);
-                        cssChunks.push(`${prefSel} { ${block} }`);
-                        result.newRulesInserted++;
-                    }
-                });
+                for (const prefSel of prefixedSelectors) {
+                    const key = prefSel + '|' + block;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    cssChunks.push(`${prefSel} { ${block} }`);
+                    result.newRulesInserted++;
+                }
+            };
+
+            for (const sheet of ctx.sheets) {
+                let rules;
+                try { rules = sheet.cssRules; } catch { result.sheetsSkipped++; continue; }
+                if (!rules) continue;
+                for (const r of Array.from(rules)) visitRule(r);
+            }
+
+            if (cssChunks.length) {
+                ctx.styleEl.textContent = (ctx.styleEl.textContent || '') + '\n' + cssChunks.join('\n');
             }
         }
-
-        // Wstrzyknij (albo podmień) <style id="byz-recolor">
-        const cssText = cssChunks.join('\n');
-        let styleEl = document.getElementById(styleId);
-        if (!styleEl) {
-            styleEl = document.createElement('style');
-            styleEl.id = styleId;
-            styleEl.setAttribute('data-generated', 'byz-recolor');
-            document.head.appendChild(styleEl);
-        }
-        styleEl.textContent = cssText;
 
         console.log(result);
     }
 
-    // ==== traversal ====
-    static processRuleDeep(rule, onStyleRule) {
-        // Reguły grupujące (@media, @supports, @layer, @container itp.)
-        if ('cssRules' in rule && rule.cssRules?.length) {
-            for (const sub of Array.from(rule.cssRules)) {
-                this.processRuleDeep(sub, onStyleRule);
+    // -------- contexts (document + shadow roots) ----------
+    static collectContexts({ styleId, includeAdopted, includeShadowRoots, maxShadowRoots }) {
+        const contexts = [];
+
+        // document context
+        contexts.push({
+            type: 'document',
+            root: document,
+            styleEl: ensureStyleEl(document, styleId),
+            sheets: gatherSheets(document, includeAdopted),
+        });
+
+        if (includeShadowRoots) {
+            let count = 0;
+            for (const el of document.querySelectorAll('*')) {
+                if (!el.shadowRoot) continue;
+                if (count++ >= maxShadowRoots) break;
+                const root = el.shadowRoot;
+                contexts.push({
+                    type: 'shadow',
+                    root,
+                    styleEl: ensureStyleEl(root, styleId),
+                    sheets: gatherSheets(root, includeAdopted),
+                });
             }
-            return;
         }
-        if (rule.type === CSSRule.STYLE_RULE && rule.style) {
-            onStyleRule(rule);
+        return contexts;
+    }
+
+    static gatherSheets(rootLike, includeAdopted) {
+        const arr = [];
+        // styleSheets
+        try { arr.push(...Array.from(rootLike.styleSheets || [])); } catch { }
+        // adoptedStyleSheets
+        if (includeAdopted && rootLike.adoptedStyleSheets) {
+            try { arr.push(...Array.from(rootLike.adoptedStyleSheets)); } catch { }
         }
+        return arr;
+    }
+
+    static ensureStyleEl(rootLike, id) {
+        // rootLike: Document or ShadowRoot
+        const doc = rootLike instanceof Document ? rootLike : rootLike.ownerDocument;
+        let styleEl = (rootLike.getElementById ? rootLike.getElementById(id) : null);
+        // ShadowRoot doesn’t implement getElementById; fallback:
+        if (!styleEl && rootLike.querySelector) {
+            styleEl = rootLike.querySelector(`style#${CSS.escape(id)}`);
+        }
+        if (!styleEl) {
+            styleEl = doc.createElement('style');
+            styleEl.id = id;
+            styleEl.setAttribute('data-generated', 'byz-recolor');
+            if (rootLike instanceof Document) rootLike.head.appendChild(styleEl);
+            else rootLike.appendChild(styleEl);
+        }
+        return styleEl;
     }
 
     // ==== wykrywanie i zamiana kolorów z alfą ====
@@ -232,4 +284,4 @@ class Modifier {
 
 }
 
-const res = Modifier.addRecolorOverrides();
+Modifier.addRecolorOverrides();
