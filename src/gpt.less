@@ -1,6 +1,7 @@
 // out: "../build/gpt.css"
 
-code, pre {
+code:not(pre code),  // only `code` tags that have no `pre` ancestor
+[data-message-author-role="user"] pre {
     background-color: #ffffff14;
     padding: 0 0.4em;
     border-radius: 0.2em;
