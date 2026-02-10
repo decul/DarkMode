@@ -1,16 +1,23 @@
-
 class Modifier {
-    'use strict';
+    // ===== Public API ==========================================================
+    static addRecolorOverrides(opts = {}) {
+        const {
+            color = '#ffffff',          // target color (keeps original alpha)
+            rgb = null,                 // or pass [r,g,b]
+            styleId = 'byz-recolor',
+            includeAdopted = true,
+            includeShadowRoots = true,
+            maxShadowRoots = 200,
+            // computed fallback:
+            alsoInline = true,
+            maxElementsPerContext = 6000,
+            observe = true              // watch for dynamically added overlays
+        } = opts;
 
-    static addRecolorOverrides() {
-        const styleId = 'byz-recolor';
-        const BLACK = this.hexToRgb("#fff");
-        const includeAdopted = true;
-        const includeShadowRoots = true;
-        const maxShadowRoots = 200;
+        const TARGET_RGB = rgb ? this.arrToRgb(rgb) : this.hexToRgb(color);
 
-        // --- gather contexts (document + shadow roots) and their stylesheets
-        const contexts = collectContexts({ styleId, includeAdopted, includeShadowRoots, maxShadowRoots });
+        // --- gather contexts (document + shadow roots) --------------------------
+        const contexts = this.collectContexts({ styleId, includeAdopted, includeShadowRoots, maxShadowRoots });
 
         const result = {
             contexts: contexts.length,
@@ -18,89 +25,80 @@ class Modifier {
             styleRulesMatched: 0,
             newRulesInserted: 0,
             sheetsSkipped: 0,
+            inlineElementsTagged: 0,
+            inlineRulesInserted: 0
         };
 
-        // process each context separately (so we can inject rules into that root)
+        // one Set per <style> to dedupe fallback rules across re-runs/observer
+        const inlineSeen = new WeakMap();
+
+        // --- pass 1: stylesheet-based overrides ---------------------------------
         for (const ctx of contexts) {
             const cssChunks = [];
-            const seen = new Set(); // unikaj duplikatów: key = selector||prop||value
+            const seen = new Set(); // avoid duplicates in this context
 
-            const visitRule = (styleRule) => {
-                // grouping blocks (@media/@supports/@layer etc.)
-                if ('cssRules' in styleRule && styleRule.cssRules?.length) {
-                    for (const sub of Array.from(styleRule.cssRules)) visitRule(sub);
+            const visitRule = (rule) => {
+                if ('cssRules' in rule && rule.cssRules?.length) {
+                    for (const sub of Array.from(rule.cssRules)) visitRule(sub);
                     return;
                 }
-                if (styleRule.type !== CSSRule.STYLE_RULE || !styleRule.style)
-                    return;
+                if (rule.type !== CSSRule.STYLE_RULE || !rule.style) return;
 
                 result.rulesScanned++;
-                    const style = styleRule.style;
+                const s = rule.style;
 
-                // Sprawdź potencjalne własności tła
                 const candidates = [
                     ['background-color', true],
                     ['background', false],
                     ['background-image', false],
                 ];
 
-                let decls = [];
-
+                const decls = [];
                 for (const [prop, singleColorOnly] of candidates) {
-                        const val = style.getPropertyValue(prop);
+                    const val = s.getPropertyValue(prop);
                     if (!val) continue;
-                        if (!this.hasSemiTransparentColor(val)) continue;
+                    if (!Modifier.hasSemiTransparentColor(val)) continue;
 
                     let newVal;
                     if (singleColorOnly) {
-                            const a = this.extractFirstAlpha(val);
+                        const a = Modifier.extractFirstAlpha(val);
                         if (a == null || a <= 0 || a >= 1) continue;
-                            newVal = this.rgbaString(BLACK, a);
+                        newVal = Modifier.rgbaString(TARGET_RGB, a);
                     } else {
-                            const replaced = this.recolorStringKeepingAlpha(val, BLACK);
+                        const replaced = Modifier.recolorStringKeepingAlpha(val, TARGET_RGB);
                         if (replaced === val) continue;
                         newVal = replaced;
                     }
 
-                    // Zachowaj !important jeśli było
-                        const prio = style.getPropertyPriority(prop);
-                    if (prio) newVal += ' !important';
-
+                    // keep or add !important so we win against atomic layers
+                    const prio = s.getPropertyPriority(prop);
+                    newVal += prio ? ' !important' : ' !important';
                     decls.push([prop, newVal]);
                 }
 
                 if (!decls.length) return;
-
                 result.styleRulesMatched++;
 
-                // Rozbij selektory po przecinku i zbuduj z prefiksami html.byz-dark/attr
-                const originalSelectors = styleRule.selectorText.split(',');
-                const prefixedSelectors = [];
-                for (let sel of originalSelectors) {
+                const orig = rule.selectorText.split(',');
+                const prefixed = [];
+                for (let sel of orig) {
                     sel = sel.trim();
                     if (!sel) continue;
                     if (ctx.type === 'document') {
-                        prefixedSelectors.push(`html.byz-dark ${sel}`);
-                        prefixedSelectors.push(`html[byz-dark] ${sel}`);
+                        prefixed.push(`html.byz-dark ${sel}`, `html[byz-dark] ${sel}`);
                     } else {
-                        // shadow root: inject inside the root using :host-context()
-                        prefixedSelectors.push(`:host-context(html.byz-dark) ${sel}`);
-                        prefixedSelectors.push(`:host-context(html[byz-dark]) ${sel}`);
+                        // inside shadow root
+                        prefixed.push(`:host-context(html.byz-dark) ${sel}`, `:host-context(html[byz-dark]) ${sel}`);
                     }
                 }
+                if (!prefixed.length) return;
 
-                if (prefixedSelectors.length === 0) return;
-
-                // Uniknij duplikatów na poziomie (selector×decl)
-                const block = decls
-                    .map(([prop, val]) => `${prop}: ${val};`)
-                    .join(' ');
-
-                for (const prefSel of prefixedSelectors) {
-                    const key = prefSel + '|' + block;
+                const block = decls.map(([p, v]) => `${p}: ${v};`).join(' ');
+                for (const psel of prefixed) {
+                    const key = psel + '|' + block;
                     if (seen.has(key)) continue;
                     seen.add(key);
-                    cssChunks.push(`${prefSel} { ${block} }`);
+                    cssChunks.push(`${psel} { ${block} }`);
                     result.newRulesInserted++;
                 }
             };
@@ -115,12 +113,122 @@ class Modifier {
             if (cssChunks.length) {
                 ctx.styleEl.textContent = (ctx.styleEl.textContent || '') + '\n' + cssChunks.join('\n');
             }
+
+            // --- pass 2: computed/inline fallback (optional) ----------------------
+            if (alsoInline) {
+                const { tagged, rules } = this.addInlineComputedOverridesForContext(
+                    ctx, TARGET_RGB, inlineSeen, maxElementsPerContext
+                );
+                result.inlineElementsTagged += tagged;
+                result.inlineRulesInserted += rules;
+            }
+
+            // --- observer for dynamic content ------------------------------------
+            if (alsoInline && observe && !ctx.__byzObserver) {
+                const schedule = this.makeScheduler(() => {
+                    this.addInlineComputedOverridesForContext(ctx, TARGET_RGB, inlineSeen, maxElementsPerContext);
+                });
+                const obs = new MutationObserver((muts) => {
+                    // re-scan only on added nodes / style/class attribute changes
+                    for (const m of muts) {
+                        if (m.type === 'childList' && (m.addedNodes?.length || m.removedNodes?.length)) {
+                            schedule();
+                            break;
+                        }
+                        if (m.type === 'attributes' && (m.attributeName === 'style' || m.attributeName === 'class')) {
+                            schedule();
+                            break;
+                        }
+                    }
+                });
+                obs.observe(ctx.root, { subtree: true, childList: true, attributes: true, attributeFilter: ['style','class'] });
+                ctx.__byzObserver = obs;
+            }
         }
 
-        console.log(result);
+        // some helpers for toggling
+        return {
+            ...result,
+            enableDarkFlag() { document.documentElement.classList.add('byz-dark'); },
+            disableDarkFlag() { document.documentElement.classList.remove('byz-dark'); document.documentElement.removeAttribute('byz-dark'); },
+            setAttrFlag(v = true) { v ? document.documentElement.setAttribute('byz-dark', '') : document.documentElement.removeAttribute('byz-dark'); },
+            removeAll() { for (const c of contexts) c.styleEl.remove(); },
+        };
     }
 
-    // -------- contexts (document + shadow roots) ----------
+    // ===== Fallback per-element (computed) ====================================
+    static addInlineComputedOverridesForContext(ctx, TARGET_RGB, inlineSeen, maxElements) {
+        const nodes = [];
+        // Collect nodes efficiently
+        // For ShadowRoot, querySelectorAll exists; for Document, too.
+        // Cap to avoid runaway on huge pages.
+        const all = ctx.root.querySelectorAll('*');
+        const len = Math.min(all.length, maxElements);
+        for (let i = 0; i < len; i++) nodes.push(all[i]);
+
+        let tagged = 0;
+        const chunks = [];
+        const seen = inlineSeen.get(ctx.styleEl) || new Set();
+
+        for (const el of nodes) {
+            // fast bailouts for common invisible types
+            const tag = el.tagName;
+            if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'LINK' || tag === 'META' || tag === 'NOSCRIPT') continue;
+
+            const cs = getComputedStyle(el);
+
+            const decls = [];
+            // 1) plain rgba() with alpha
+            const m = /^\s*rgba\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d*\.?\d+)\s*\)\s*$/i.exec(cs.backgroundColor);
+            if (m) {
+                const a = parseFloat(m[4]);
+                if (a > 0 && a < 1) {
+                    decls.push(['background-color', `${this.rgbaString(TARGET_RGB, a)} !important`]);
+                }
+            }
+
+            // 2) gradients or other background-image that carries alpha
+            const bgImg = cs.backgroundImage;
+            if (bgImg && /gradient/i.test(bgImg) && this.hasSemiTransparentColor(bgImg)) {
+                const replaced = this.recolorStringKeepingAlpha(bgImg, TARGET_RGB);
+                if (replaced !== bgImg) {
+                    decls.push(['background-image', `${replaced} !important`]);
+                }
+            }
+
+            if (!decls.length) continue;
+
+            if (!el.hasAttribute('data-byz-uid')) {
+                // reasonably unique per document; ok to collide across contexts
+                el.setAttribute('data-byz-uid', Math.random().toString(36).slice(2, 9));
+                tagged++;
+            }
+            const uid = el.getAttribute('data-byz-uid');
+
+            const block = decls.map(([p, v]) => `${p}: ${v};`).join(' ');
+
+            if (ctx.type === 'document') {
+                const s1 = `html.byz-dark [data-byz-uid="${uid}"] { ${block} }`;
+                const s2 = `html[byz-dark] [data-byz-uid="${uid}"] { ${block} }`;
+                if (!seen.has(s1)) { chunks.push(s1); seen.add(s1); }
+                if (!seen.has(s2)) { chunks.push(s2); seen.add(s2); }
+            } else {
+                const s1 = `:host-context(html.byz-dark) [data-byz-uid="${uid}"] { ${block} }`;
+                const s2 = `:host-context(html[byz-dark]) [data-byz-uid="${uid}"] { ${block} }`;
+                if (!seen.has(s1)) { chunks.push(s1); seen.add(s1); }
+                if (!seen.has(s2)) { chunks.push(s2); seen.add(s2); }
+            }
+        }
+
+        if (chunks.length) {
+            ctx.styleEl.textContent = (ctx.styleEl.textContent || '') + '\n' + chunks.join('\n');
+        }
+        inlineSeen.set(ctx.styleEl, seen);
+
+        return { tagged, rules: chunks.length };
+    }
+
+    // ===== Contexts (document + shadow roots) =================================
     static collectContexts({ styleId, includeAdopted, includeShadowRoots, maxShadowRoots }) {
         const contexts = [];
 
@@ -128,8 +236,8 @@ class Modifier {
         contexts.push({
             type: 'document',
             root: document,
-            styleEl: ensureStyleEl(document, styleId),
-            sheets: gatherSheets(document, includeAdopted),
+            styleEl: this.ensureStyleEl(document, styleId),
+            sheets: this.gatherSheets(document, includeAdopted),
         });
 
         if (includeShadowRoots) {
@@ -141,8 +249,8 @@ class Modifier {
                 contexts.push({
                     type: 'shadow',
                     root,
-                    styleEl: ensureStyleEl(root, styleId),
-                    sheets: gatherSheets(root, includeAdopted),
+                    styleEl: this.ensureStyleEl(root, styleId),
+                    sheets: this.gatherSheets(root, includeAdopted),
                 });
             }
         }
@@ -151,23 +259,17 @@ class Modifier {
 
     static gatherSheets(rootLike, includeAdopted) {
         const arr = [];
-        // styleSheets
-        try { arr.push(...Array.from(rootLike.styleSheets || [])); } catch { }
-        // adoptedStyleSheets
+        try { arr.push(...Array.from(rootLike.styleSheets || [])); } catch {}
         if (includeAdopted && rootLike.adoptedStyleSheets) {
-            try { arr.push(...Array.from(rootLike.adoptedStyleSheets)); } catch { }
+            try { arr.push(...Array.from(rootLike.adoptedStyleSheets)); } catch {}
         }
         return arr;
     }
 
     static ensureStyleEl(rootLike, id) {
-        // rootLike: Document or ShadowRoot
         const doc = rootLike instanceof Document ? rootLike : rootLike.ownerDocument;
         let styleEl = (rootLike.getElementById ? rootLike.getElementById(id) : null);
-        // ShadowRoot doesn’t implement getElementById; fallback:
-        if (!styleEl && rootLike.querySelector) {
-            styleEl = rootLike.querySelector(`style#${CSS.escape(id)}`);
-        }
+        if (!styleEl && rootLike.querySelector) styleEl = rootLike.querySelector(`style#${CSS.escape(id)}`);
         if (!styleEl) {
             styleEl = doc.createElement('style');
             styleEl.id = id;
@@ -178,14 +280,24 @@ class Modifier {
         return styleEl;
     }
 
-    // ==== wykrywanie i zamiana kolorów z alfą ====
+    // ===== Small scheduler for observers ======================================
+    static makeScheduler(fn) {
+        let scheduled = false;
+        return () => {
+            if (scheduled) return;
+            scheduled = true;
+            requestAnimationFrame(() => { scheduled = false; fn(); });
+        };
+    }
+
+    // ===== Color parsing / transforms =========================================
     static re = {
         rgbaComma: /rgba\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d*\.?\d+)\s*\)/gi,
-        rgbSlash: /rgb\(\s*(\d{1,3})\s+(\d{1,3})\s+(\d{1,3})\s*\/\s*(\d*\.?\d+)\s*\)/gi,
-        hsla: /hsla\(\s*([^,()]+)\s*,\s*([^,()]+)\s*,\s*([^,()]+)\s*,\s*(\d*\.?\d+)\s*\)/gi,
-        hslSlash: /hsl\(\s*[^/()]+\/\s*(\d*\.?\d+)\s*\)/gi,
-        hex8: /#([0-9a-fA-F]{8})\b/g,
-        hex4: /#([0-9a-fA-F]{4})\b/g,
+        rgbSlash:  /rgb\(\s*(\d{1,3})\s+(\d{1,3})\s+(\d{1,3})\s*\/\s*(\d*\.?\d+)\s*\)/gi,
+        hsla:      /hsla\(\s*([^,()]+)\s*,\s*([^,()]+)\s*,\s*([^,()]+)\s*,\s*(\d*\.?\d+)\s*\)/gi,
+        hslSlash:  /hsl\(\s*[^/()]+\/\s*(\d*\.?\d+)\s*\)/gi,
+        hex8:      /#([0-9a-fA-F]{8})\b/g,
+        hex4:      /#([0-9a-fA-F]{4})\b/g,
     };
 
     static hasSemiTransparentColor(str) {
@@ -239,13 +351,11 @@ class Modifier {
         const toRgba = (_, a) => this.rgbaString(NEW_RGB, this.clamp01(parseFloat(a)));
 
         str = str.replace(this.re.rgbaComma, (_, _r, _g, _b, a) => toRgba(_, a));
-        str = str.replace(this.re.rgbSlash, (_, _r, _g, _b, a) => toRgba(_, a));
-        str = str.replace(this.re.hsla, () => {
-            const args = arguments; // (..., a, idx, input)
-            const a = args[3];
-            return toRgba(null, a);
+        str = str.replace(this.re.rgbSlash,  (_, _r, _g, _b, a) => toRgba(_, a));
+        str = str.replace(this.re.hsla,      () => {
+            const args = arguments; const a = args[3]; return toRgba(null, a);
         });
-        str = str.replace(this.re.hslSlash, (_, a) => toRgba(_, a));
+        str = str.replace(this.re.hslSlash,  (_, a) => toRgba(_, a));
 
         str = str.replace(this.re.hex8, (_, hex) => {
             const a = parseInt(hex.slice(6, 8), 16) / 255;
@@ -262,7 +372,7 @@ class Modifier {
         return str;
     }
 
-    // ==== utils kolorów ====
+    // ===== Helpers =============================================================
     static rgbaString({ r, g, b }, a) {
         return `rgba(${this.clamp255(r)}, ${this.clamp255(g)}, ${this.clamp255(b)}, ${this.clamp01(a)})`;
     }
@@ -273,15 +383,28 @@ class Modifier {
         if (h.length === 4) h = h.slice(0, 3).split('').map(c => c + c).join('') + 'ff';
         if (h.length === 6) return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16) };
         if (h.length === 8) return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16) };
-        throw new Error(`Niepoprawny HEX: ${hex}`);
+        throw new Error(`Invalid HEX: ${hex}`);
     }
     static arrToRgb(a) {
-        if (!Array.isArray(a) || a.length !== 3) throw new Error('rgb musi być [r,g,b]');
+        if (!Array.isArray(a) || a.length !== 3) throw new Error('rgb must be [r,g,b]');
         return { r: +a[0], g: +a[1], b: +a[2] };
     }
     static clamp255 = (n) => Math.max(0, Math.min(255, Math.round(n)));
     static clamp01 = (n) => Math.max(0, Math.min(1, +n));
-
 }
 
-Modifier.addRecolorOverrides();
+// Example usage (same as before, now with options)
+// Recolors to white, scans adopted stylesheets & shadow roots, adds computed fallback and observes DOM.
+Modifier.addRecolorOverrides({
+    color: '#ffffff',
+    includeAdopted: true,
+    includeShadowRoots: true,
+    alsoInline: true,
+    observe: true
+});
+
+// Toggle on/off:
+// document.documentElement.classList.add('byz-dark');
+// document.documentElement.setAttribute('byz-dark', '');
+// document.documentElement.classList.remove('byz-dark');
+// document.documentElement.removeAttribute('byz-dark');
