@@ -3,111 +3,88 @@
     "description": "Enables dark mode on various websites",
     "version": "1.0",
     "manifest_version": 3,
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "dark-mode@byzio.pl"
+        }
+    },
     "content_scripts": [
         {
             "run_at":     "document_start",
-            "matches":  [ "https://www.reddit.com/*"         ],
-            "css":      [ "src/reddit/reddit.css"            ],
-            "js":       [ "src/reddit/reddit.js"                        ]
+            "matches":  [ "https://translate.google.pl/*" ],
+            "css":      [ "src/google/translate.css" ]
         },
         {
             "run_at":     "document_start",
-            "matches":  [ "https://www.reddit.com/r/pureasoiaf/*"   ],
-            "css":      [ "src/reddit/reddit_pureasoiaf.css"                   ]
+            "matches":  [ "https://docs.google.com/*" ],
+            "css":      [ "build/google-documents.css" ]
         },
         {
             "run_at":     "document_start",
-            "matches":  [ "https://translate.google.pl/*"   ],
-            "css":      [ "src/google/translate.css"                   ]
+            "matches":  [ "https://mail.google.com/*" ],
+            "css":      [ "build/gmail.css" ]
         },
         {
             "run_at":     "document_start",
-            "matches":  [ "https://docs.google.com/*"       ],
-            "css":      [ "build/google-documents.css"      ]
+            "matches":  [ "https://docs.spring.io/*" ],
+            "css":      [ "src/docs-spring.css" ]
         },
         {
             "run_at":     "document_start",
-            "matches":  [ "https://mail.google.com/*"       ],
-            "css":      [ "build/gmail.css"                 ]
+            "matches":  [ "https://chatgpt.com/*" ],
+            "css":      [ "build/gpt.css" ]
         },
         {
             "run_at":     "document_start",
-            "matches":  [ "https://docs.spring.io/*"        ],
-            "css":      [ "src/docs-spring.css"                 ]
+            "matches":  [ "https://www.linkedin.com/*" ],
+            "css":      [ "src/linkedIn.css" ]
         },
         {
             "run_at":     "document_start",
-            "matches":  [ "https://chatgpt.com/*"       ],
-            "css":      [ "build/gpt.css"               ]
+            "matches":  [ "https://www.notion.so/*" ],
+            "css":      [ "build/notion.css" ]
         },
         {
             "run_at":     "document_start",
-            "matches":  [ "https://gemini.google.com/*"       ],
-            "css":      [ "src/google/gemini.css"                         ]
+            "matches":  [ "*://*/osip/*" ],
+            "css":      [ "build/osip.css" ]
+        },
+        {
+            "run_at":     "document_start",
+            "matches":  [ "https://redmine.unity-t.pl/*" ],
+            "css":      [ "build/redmine.css" ]
         },
         {
             "run_at":     "document_end",
-            "matches":  [ "https://chat.deepseek.com/*"       ],
-            "css":      [ "src/deep-seek.css"                         ]
+            "matches":  [ "https://vuejs.org/*" ],
+            "css":      [ "build/vuejs.css" ]
         },
         {
             "run_at":     "document_start",
-            "matches":  [ "https://www.linkedin.com/*"      ],
-            "css":      [ "src/linkedIn.css"                    ]
+            "matches":  [ "http://czasownik.krk.ut/*" ],
+            "css":      [ "build/czasownik.css" ]
         },
-        {
-            "run_at":     "document_start",
-            "matches":  [ "https://www.notion.so/*"         ],
-            "css":      [ "build/notion.css"                ]
-        },
-        {
-            "run_at":     "document_start",
-            "matches":  [ "*://*/osip/*"                    ],
-            "css":      [ "build/osip.css"                  ]
-        },
-        {
-            "run_at":     "document_start",
-            "matches":  [ "https://redmine.unity-t.pl/*"    ],
-            "css":      [ "build/redmine.css"               ]
-        },
-        {
-            "run_at":     "document_end",
-            "matches":  [ "https://vuejs.org/*"    ],
-            "css":      [ "build/vuejs.css"               ]
-        },
-        {
-            "run_at":     "document_start",
-            "matches":  [ "http://czasownik.krk.ut/*"    ],
-            "css":      [ "build/czasownik.css"               ]
-        }, 
         {
             "run_at": "document_start",
             "match_origin_as_fallback": true,
             "exclude_matches": [
-                "https://www.reddit.com/*",
                 "https://docs.google.com/*",
                 "https://chat.openai.com/*",
                 "https://vuejs.org/*"
             ],
-            "matches":  [ "<all_urls>"          ],
-            "css":      [ "build/generic.css"   ]
+            "matches":  [ "<all_urls>" ],
+            "css":      [ "build/generic.css" ]
         },
         {
             "run_at":     "document_start",
-            "matches":  [ "<all_urls>"          ],
-            "js":       [ "src/generic/generic.js"          ]
+            "matches":  [ "<all_urls>" ],
+            "js":       [ "src/generic/generic.js" ]
         },
         {
             "run_at":     "document_end",
-            "matches":  [ "<all_urls>"          ],
-            "js":       [ "src/scripts/htmlPrep.js"         ]
-        },
-        {
-            "run_at":     "document_idle",
-            "matches":  [ "<all_urls>"          ],
-            "js":       [ "src/generic/modifier.js"          ]
+            "matches":  [ "<all_urls>" ],
+            "js":       [ "src/scripts/htmlPrep.js" ]
         }
-        
     ],
     "web_accessible_resources": [{
         "resources": [ "img" ],

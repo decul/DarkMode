@@ -11,23 +11,3 @@ div.user-message-bubble-color code,
 div.user-message-bubble-color pre {
   background-color: #094077;
 }
-/* Code */
-span.ͼo {
-  color: white;
-}
-/* String */
-span.ͼi {
-  color: #FFAD7B;
-}
-/* Type */
-span.ͼg {
-  color: #4CFFE0;
-}
-/* Literal */
-span.ͼj {
-  color: #50B2FF;
-}
-/* Modifier */
-span.ͼh {
-  color: #50B2FF;
-}

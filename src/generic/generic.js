@@ -32,7 +32,7 @@ class ByzioDarkMode {
 
     static async isEnabledGlobally() {
         let result = await chrome.storage.local.get(["enabledGlobally"]);
-        return result.enabledGlobally;
+        return result.enabledGlobally ?? true;
     }
 
     static saveEnabledLocally(state) {
