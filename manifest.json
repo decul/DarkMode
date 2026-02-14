@@ -78,7 +78,7 @@
         {
             "run_at":     "document_start",
             "matches":  [ "<all_urls>" ],
-            "js":       [ "src/generic/generic.js" ]
+            "js":       [ "src/scripts/browserApi.js", "src/generic/generic.js" ]
         },
         {
             "run_at":     "document_end",

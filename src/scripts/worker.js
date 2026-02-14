@@ -1,3 +1,5 @@
+importScripts("browserApi.js");
+
 
 /**
  * Debug this by clicking 'Inspect views service worker' by your extension, on the extensions tab.
@@ -6,11 +8,11 @@
 let clicked = false;
 
 
-chrome.runtime.onStartup.addListener(updateIcon);
-chrome.runtime.onInstalled.addListener(updateIcon);
+ExtensionApi.runtime.onStartup.addListener(updateIcon);
+ExtensionApi.runtime.onInstalled.addListener(updateIcon);
 
 
-chrome.action.onClicked.addListener(async activeTab => {
+ExtensionApi.action.onClicked.addListener(async activeTab => {
   if (clicked) {
     clicked = false;
     onDoubleClick(activeTab);
@@ -28,23 +30,20 @@ chrome.action.onClicked.addListener(async activeTab => {
 
 
 async function onDoubleClick(activeTab) {
-  const result = await chrome.storage.local.get(["enabledGlobally"]);
+  const result = await ExtensionApi.storageLocalGet(["enabledGlobally"]);
   const enabled = !result.enabledGlobally;
   updateIcon(enabled);
-  await chrome.storage.local.set({ enabledGlobally: enabled });
+  await ExtensionApi.storageLocalSet({ enabledGlobally: enabled });
   updateTabs({});
 }
 
 
 async function onClick(activeTab) {
-  const result = await chrome.storage.local.get(["enabledGlobally"]);
+  const result = await ExtensionApi.storageLocalGet(["enabledGlobally"]);
   if (!result.enabledGlobally)
     return;
 
-  await chrome.scripting.executeScript({
-    target: { tabId: activeTab.id },
-    function: () => ByzioDarkMode.toggle()
-  });
+  await ExtensionApi.executeFunctionInTab(activeTab.id, () => ByzioDarkMode.toggle());
 
   const condition = { 
     url: /^.*:\/\/[^/]+\//.exec(activeTab.url)[0] + "*"
@@ -56,29 +55,26 @@ async function onClick(activeTab) {
 function updateTabs(condition) {
   const update = () => ByzioDarkMode.update();
 
-  chrome.tabs.query(condition, async tabs => {
+  ExtensionApi.queryTabs(condition).then(tabs => {
     console.log("Tabs found: ", tabs);
 
     for (const tab of tabs) {
-      chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        function: update
-      })
-      .then(() => console.log("Theme changed on: " + tab.url))
-      .catch(err => console.log("Failed to change theme on: " + tab.url, err));
-    };
+      ExtensionApi.executeFunctionInTab(tab.id, update)
+        .then(() => console.log("Theme changed on: " + tab.url))
+        .catch(err => console.log("Failed to change theme on: " + tab.url, err));
+    }
   });
 }
 
 
 async function updateIcon(enabled) {
   if (enabled === undefined) {
-    const result = await chrome.storage.local.get(["enabledGlobally"]);
+    const result = await ExtensionApi.storageLocalGet(["enabledGlobally"]);
     enabled = result.enabledGlobally;
   }
 
   const path = enabled ? "img/IconDark.png" : "img/IconLight.png"
-  chrome.action.setIcon({ path: path })
+  ExtensionApi.setIcon(path)
 }
 
 
