@@ -1,4 +1,4 @@
-console.log("Initializing dark mode");
+console.log("Initializing dark mode content script");
 
 class ByzioDarkMode {
 

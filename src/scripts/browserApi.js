@@ -37,7 +37,7 @@
             if (browser.scripting?.executeScript) {
                 return browser.scripting.executeScript({
                     target: { tabId },
-                    function: fn
+                    func: fn
                 });
             }
 
