@@ -1,11 +1,14 @@
 {
     "name": "Dark Mode",
     "description": "Enables dark mode on various websites",
-    "version": "1.0",
+    "version": "1.0.0.1",
     "manifest_version": 3,
     "browser_specific_settings": {
         "gecko": {
-            "id": "dark-mode@byzio.pl"
+            "id": "dark-mode@byzio.pl",
+            "data_collection_permissions": {
+                "required": ["none"]
+            }
         }
     },
     "content_scripts": [
